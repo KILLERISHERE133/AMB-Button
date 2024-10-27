@@ -1,7 +1,10 @@
-<!DOCTYPE html> 
+ <!DOCTYPE html> 
 <html> 
 <title>Call Ambulance</title> 
 <head bgcolor="red"> 
+<marquee behavior="scroll" direction="right">
+Welcome to AMB-Button
+</marquee>
 <title>Call Ambulance</title>
 <meta name="viewport" content="width=device-width, initial-scale=1"> 
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
@@ -39,7 +42,7 @@ font-family: impact, sans-serif;
 .text {
    color: white;
    font-size: 15px;
-   font-family: "Times New Roman", Times, serif;
+   font-family: impact, sans-serif;
   position: absolute;
   top: 64%;
   left: 50%;
@@ -47,28 +50,52 @@ font-family: impact, sans-serif;
 }
  .text2 {
 background-color: Black;
-    color:Blue;
-   font-size: 20px;
-   font-family: "Times New Roman", Times, serif;
+    color:White;
+   font-size: 22px;
+   font-family: impact, sans-serif;
   position: absolute;
+text-align: center;
   top: 35%;
-  left: 55%;
+  left: 50%;
   transform: translate(-50%, -50%);
-width: 300px;
 padding: -100px -100px;
+  width: 230px;
+  height: 60px;
+  background-color: black;
+  animation-name: nigga;
+  animation-duration: 5s;
+animation-iteration-count: infinite;
 }
+@keyframes nigga {
+  0%   {background-color: red;}
+  25%  {background-color: white; 
+             color:red; 
+text-decoration:none;} 
+  50%  {background-color: blue;
+color:white}
+  100% {background-color: red;}
+}
+
+ }
  .text2:hover {
-         color: Red
+         color: Red;
+
 } 
 .text:hover{
-color: red;
+color: white;
+}
+@media only screen and (max-width: 600px) {
+.text:hover {
+color:red;
+} 
 }
 @media only screen and (max-width: 600px) {
 .text2 { 
 font-size: 15px;
-top: 10%;
-left: 50%;
-width: 120px;
+top: 13%;
+left: 48%;
+width: 200px;
+height: 45px;
 padding: 0px 0px;
 text-align: center;
             }
@@ -93,13 +120,14 @@ font-size: 22px;
 	color: blue;
 font-size:8px;
 padding: 3px 6px;
-top: 22%;
+top: 21%;
         }
 }
 @media only screen and (max-width: 600px) {
 .text { 
 font-size: 8px; 
-top: 28%;
+top: 30%;
+color:red;
         }
 }
 .Hoverable {
