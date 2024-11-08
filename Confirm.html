@@ -7,51 +7,46 @@ position: absolute;
 top: 30%;
 left: 35%;
 transform: translate(-50% 50);
+color: white;
 }
 body {
-background-color: white;
-  animation-name: nigga;
-  animation-duration: 3s;
-animation-iteration-count: infinite;
-}
-@keyframes nigga {
-  0%   {background-color: white;}
-  25%  {background-color: red;} 
-  50%  {background-color: white;}
-  100% {background-color: red;}
+background-color: black;
 }
 .btn{
 font-size: 40px;
 font-family:;
 padding: 5px 10px;
-color: White;
-background-color: Red;
+color: black;
+background-color: white;
 position: absolute;
 top: 50%;
 left: 40%;
 transform: translate(-50% , 50%);
 transition-duration: 0.4s;
+border: 2px solid red;
+border-radius: 5px;
 }
 .black {
 font-size: 40px;
 font-family:;
 padding: 5px 10px;
-color: White;
-background-color: black;
+color: black;
+background-color: white;
 position: absolute;
 top: 50%;
 left: 60%;
 transform: translate(-50% , 50%);
 transition-duration: 0.4s;
-radius:20px;
+border: 2px solid red;
+border-radius: 5px;
 }
 
 .btn:hover{
-background-color: blue;
+background-color: red;
 }
 .black:hover{
-background-color:red;
-color: white;
+background-color: green;
+color: black;
 }
 .btn:active { 
 background-color: green;
@@ -63,7 +58,7 @@ box-shadow:4px 4px ;
 background-color: blue;
 color: black;
 transition-duration:0.4s;
-box-shadow:4px 4px ;
+box-shadow:4px 4px #FFFFFF;
 }
 @media only screen and(max-width:600px) {
 .btn {
