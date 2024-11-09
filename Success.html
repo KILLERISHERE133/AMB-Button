@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distance Matrix Map with Location Centering</title>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&libraries=places" async defer></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js"></script>
+    <script src="script.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #map {
+      height: 400px;
+      width: 80%;
+      margin: 20px 0;
+    }
+
+    #search-bar, #my-location-btn {
+      width: 80%;
+      padding: 10px;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    #request-section, #response-section {
+      width: 80%;
+      margin-bottom: 20px;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <h1>Google Maps Distance Matrix with Search and Location Centering</h1>
+  
+  <!-- Search bar -->
+  <input id="search-bar" type="text" placeholder="Search for a location..." />
+  
+  <!-- Button to center map on user's location -->
+  <button id="my-location-btn">Center on My Location</button>
+  
+  <div id="map"></div>
+  
+  <div id="request-section">
+    <h2>Request</h2>
+    <pre id="request"></pre>
+  </div>
+  
+  <div id="response-section">
+    <h2>Response</h2>
+    <pre id="response"></pre>
+  </div>
+  
+  <script>
+   
+  </script>
+</body>
+</html>
