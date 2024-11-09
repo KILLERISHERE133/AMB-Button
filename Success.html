@@ -5,11 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Distance Matrix Map with Location Centering</title>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&libraries=places" async defer></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-analytics.js"></script>
-<link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js"></script>
+    <script src="script.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -47,22 +48,27 @@
 </head>
 <body>
   <h1>Google Maps Distance Matrix with Search and Location Centering</h1>
+  
+  <!-- Search bar -->
   <input id="search-bar" type="text" placeholder="Search for a location..." />
+  
+  <!-- Button to center map on user's location -->
   <button id="my-location-btn">Center on My Location</button>
+  
   <div id="map"></div>
+  
   <div id="request-section">
     <h2>Request</h2>
     <pre id="request"></pre>
   </div>
+  
   <div id="response-section">
     <h2>Response</h2>
     <pre id="response"></pre>
   </div>
-
+  
   <script>
-    let map;
-    let markersArray = [];
-
+       // Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyDjkwSIZcaUg_oGQI3E4E-2XLix9c_jubo",
       authDomain: "amb-button-451ba.firebaseapp.com",
@@ -74,42 +80,63 @@
       measurementId: "G-3T4NLT6DX6"
     };
 
+    // Initialize Firebase
     const app = firebase.initializeApp(firebaseConfig);
+    const analytics = firebase.analytics();
     const auth = firebase.auth();
     const database = firebase.database();
-
+ 
+let map;
+    let markersArray = [];
+    // Initialize Map
     function initMap() {
       const bounds = new google.maps.LatLngBounds();
+      
       map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 55.53, lng: 9.4 },
         zoom: 10,
       });
 
+      // Initialize services
       const geocoder = new google.maps.Geocoder();
       const service = new google.maps.DistanceMatrixService();
-
+      
+      // Set up Autocomplete for the search bar
       const input = document.getElementById("search-bar");
       const autocomplete = new google.maps.places.Autocomplete(input);
       autocomplete.bindTo("bounds", map);
 
+      // Listen for place selection
       autocomplete.addListener("place_changed", () => {
         const place = autocomplete.getPlace();
+        
         if (!place.geometry || !place.geometry.location) {
-          window.alert("No details available for input: '" + place.name + "'");
+          window.alert("No details available for input: '" + place.name + "'"); 
           return;
         }
+
+        // Center the map on the selected place
         map.panTo(place.geometry.location);
         map.setZoom(14);
+
+        // Clear out any old markers
         deleteMarkers();
+
+        // Place a marker at the searched location
         markersArray.push(new google.maps.Marker({
           map: map,
           position: place.geometry.location,
         }));
       });
 
+      // Distance Matrix request
+      const origin1 = { lat: 24.9225, lng: 67.062 };
+      const origin2 = "Karachi, Pakistan";
+      const destinationA = "Punjab, Pakistan";
+      const destinationB = { lat: 31.17, lng: 72.709 };
       const request = {
-        origins: [{ lat: 24.9225, lng: 67.062 }],
-        destinations: [{ lat: 31.17, lng: 72.709 }],
+        origins: [origin1, origin2],
+        destinations: [destinationA, destinationB],
         travelMode: google.maps.TravelMode.DRIVING,
         unitSystem: google.maps.UnitSystem.METRIC,
         avoidHighways: false,
@@ -118,13 +145,71 @@
 
       document.getElementById("request").innerText = JSON.stringify(request, null, 2);
 
-      service.getDistanceMatrix(request, (response, status) => {
-        if (status === google.maps.DistanceMatrixStatus.OK) {
-          document.getElementById("response").innerText = JSON.stringify(response, null, 2);
-        } else {
-          alert("Error: " + status);
+      service.getDistanceMatrix(request).then((response) => {
+        document.getElementById("response").innerText = JSON.stringify(response, null, 2);
+        
+        const originList = response.originAddresses;
+        const destinationList = response.destinationAddresses;
+        deleteMarkers();
+
+        const showGeocodedAddressOnMap = (asDestination) => {
+          const handler = ({ results }) => {
+            map.fitBounds(bounds.extend(results[0].geometry.location));
+            markersArray.push(
+              new google.maps.Marker({
+                map,
+                position: results[0].geometry.location,
+                label: asDestination ? "D" : "O",
+              })
+            );
+          };
+          return handler;
+        };
+
+        for (let i = 0; i < originList.length; i++) {
+          const results = response.rows[i].elements;
+          geocoder.geocode({ address: originList[i] }).then(showGeocodedAddressOnMap(false));
+          for (let j = 0; j < results.length; j++) {
+            geocoder.geocode({ address: destinationList[j] }).then(showGeocodedAddressOnMap(true));
+          }
         }
       });
+
+      // Add event listener to the "Center on My Location" button
+      document.getElementById("my-location-btn").addEventListener("click", centerOnMyLocation);
+    }
+
+    // Function to center map on user's location
+    function centerOnMyLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const userLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+
+            // Center the map and add a marker at the user's location
+            map.setCenter(userLocation);
+            map.setZoom(14);
+
+            // Clear out any old markers
+            deleteMarkers();
+
+            // Place a marker at the user's location
+            markersArray.push(new google.maps.Marker({
+              map: map,
+              position: userLocation,
+              label: "You",
+            }));
+          },
+          () => {
+            alert("Error: Unable to retrieve your location.");
+          }
+        );
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
     }
 
     function deleteMarkers() {
