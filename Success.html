@@ -3,27 +3,122 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Distance Matrix Map with Location Centering</title>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyARkREkIOrV4ANugxbYFq8hzq8oUPEVZOU&callback=initMap&libraries=places" async defer></script>
+  <title>Ambulance Tracking and Calling Service</title>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&libraries=places,geometry" async defer></script>
   <style>
+    /* Page styling */
     body {
       font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      animation: fadeIn 1s ease-in-out;
     }
 
+    h1 {
+      color: #333;
+      font-size: 36px;
+      margin-top: 20px;
+    }
+
+    /* Input boxes styling */
+    input[type="text"] {
+      width: 80%;
+      padding: 12px;
+      margin-bottom: 15px;
+      font-size: 16px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      background-color: #e9f7ff;
+      transition: all 0.3s ease-in-out;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      animation: inputFocus 0.5s ease-in-out; /* Animation applied on page load */
+    }
+   #origin-input, #destination-input {
+      background-color: 
+      font-size: 18px;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #4CAF50;
+      box-shadow: 0 4px 8px rgba(0, 123, 0, 0.4);
+    }
+
+    input[type="text"]::placeholder {
+      color: #888;
+      font-style: italic;
+    }
+
+    /* Button styles */
+    button {
+      background-color: #4CAF50; /* Green background */
+      color: white;
+      border: none;
+      padding: 14px 450px;
+      font-size: 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 15px; /* Added margin for spacing */
+    }
+
+    button:hover {
+      background-color: #45a049;
+      transform: scale(1.05);
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    button:active {
+      background-color: #388e3c;
+      transform: scale(0.98);
+    }
+
+    /* Profile card styling */
+    .profile-card {
+      width: 300px;
+      background-color: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-top: 30px; /* Increased margin for spacing */
+      text-align: center;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .profile-card:hover {
+      transform: scale(1.05);
+    }
+
+    .profile-img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin-bottom: 15px;
+      border: 5px solid #4CAF50;
+    }
+
+    .profile-name {
+      font-size: 22px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .profile-phone {
+      font-size: 18px;
+      color: #4CAF50;
+    }
+
+    /* Layout */
     #map {
       height: 400px;
       width: 80%;
       margin: 20px 0;
-    }
-
-    #search-bar, #my-location-btn {
-      width: 80%;
-      padding: 10px;
-      margin-bottom: 10px;
-      font-size: 16px;
     }
 
     #request-section, #response-section {
@@ -34,133 +129,99 @@
       border: 1px solid #ccc;
     }
 
-    pre {
-      white-space: pre-wrap;
-      word-wrap: break-word;
+    /* Add space between profile card and request/response sections */
+    #request-section, #response-section {
+      margin-top: 30px; /* Added margin-top to create space */
     }
+
+    /* Input animation */
+    @keyframes inputFocus {
+      from {
+        transform: scale(0.95);
+        opacity: 0.5;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* Page transition */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
   </style>
 </head>
 <body>
-  <h1>Google Maps Distance Matrix with Search and Location Centering</h1>
-  
-  <!-- Search bar -->
-  <input id="search-bar" type="text" placeholder="Search for a location..." />
-  
-  <!-- Button to center map on user's location -->
+  <h1>Ambulance Tracking and Calling Service</h1>
+
+  <!-- User inputs for origin and destination -->
+  <input id="origin-input" type="text" placeholder="Enter origin location..." />
+  <input id="destination-input" type="text" placeholder="Enter destination location..." />
+
+  <!-- Buttons to center map, request ambulance, and clear info -->
   <button id="my-location-btn">Center on My Location</button>
-  
+  <button id="request-ambulance-btn">Request Ambulance</button>
+  <button id="clear-info-btn">Clear Info</button>
+
+  <!-- Map Container -->
   <div id="map"></div>
-  
+
+  <!-- Profile Box Section -->
+  <div class="profile-card">
+    <img class="profile-img" src="https://www.w3schools.com/w3images/avatar2.png" alt="Profile Picture">
+    <div class="profile-name">John Doe</div>
+    <div class="profile-phone">+1 (555) 123-4567</div>
+  </div>
+
+  <!-- Request and Response Sections -->
   <div id="request-section">
     <h2>Request</h2>
     <pre id="request"></pre>
   </div>
-  
+
   <div id="response-section">
     <h2>Response</h2>
     <pre id="response"></pre>
   </div>
-  
-  <script>
-   
- 
 
+  <script>
+    // JavaScript logic for map and buttons
     let map;
     let markersArray = [];
+    let ambulanceMarker;
+    let infoWindow;
+    let service;
+    let geocoder;
 
     function initMap() {
-      const bounds = new google.maps.LatLngBounds();
-      
+      const initialLocation = { lat: 24.9225, lng: 67.062 };
       map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 55.53, lng: 9.4 },
+        center: initialLocation,
         zoom: 10,
       });
 
-      // Initialize services
-      const geocoder = new google.maps.Geocoder();
-      const service = new google.maps.DistanceMatrixService();
-      
-      // Set up Autocomplete for the search bar
-      const input = document.getElementById("search-bar");
-      const autocomplete = new google.maps.places.Autocomplete(input);
-      autocomplete.bindTo("bounds", map);
+      geocoder = new google.maps.Geocoder();
+      service = new google.maps.DistanceMatrixService();
 
-      // Listen for place selection
-      autocomplete.addListener("place_changed", () => {
-        const place = autocomplete.getPlace();
-        
-        if (!place.geometry || !place.geometry.location) {
-          window.alert("No details available for input: '" + place.name + "'");
-          return;
-        }
+      const originInput = document.getElementById("origin-input");
+      const destinationInput = document.getElementById("destination-input");
+      new google.maps.places.Autocomplete(originInput);
+      new google.maps.places.Autocomplete(destinationInput);
 
-        // Center the map on the selected place
-        map.panTo(place.geometry.location);
-        map.setZoom(14);
-
-        // Clear out any old markers
-        deleteMarkers();
-
-        // Place a marker at the searched location
-        markersArray.push(new google.maps.Marker({
-          map: map,
-          position: place.geometry.location,
-        }));
-      });
-
-      // Distance Matrix request
-      const origin1 = { lat: 24.9225, lng: 67.062 };
-      const origin2 = "Karachi, Pakistan";
-      const destinationA = "Punjab, Pakistan";
-      const destinationB = { lat: 31.17, lng: 72.709 };
-      const request = {
-        origins: [origin1, origin2],
-        destinations: [destinationA, destinationB],
-        travelMode: google.maps.TravelMode.DRIVING,
-        unitSystem: google.maps.UnitSystem.METRIC,
-        avoidHighways: false,
-        avoidTolls: false,
-      };
-
-      document.getElementById("request").innerText = JSON.stringify(request, null, 2);
-
-      service.getDistanceMatrix(request).then((response) => {
-        document.getElementById("response").innerText = JSON.stringify(response, null, 2);
-        
-        const originList = response.originAddresses;
-        const destinationList = response.destinationAddresses;
-        deleteMarkers();
-
-        const showGeocodedAddressOnMap = (asDestination) => {
-          const handler = ({ results }) => {
-            map.fitBounds(bounds.extend(results[0].geometry.location));
-            markersArray.push(
-              new google.maps.Marker({
-                map,
-                position: results[0].geometry.location,
-                label: asDestination ? "D" : "O",
-              })
-            );
-          };
-          return handler;
-        };
-
-        for (let i = 0; i < originList.length; i++) {
-          const results = response.rows[i].elements;
-
-          geocoder.geocode({ address: originList[i] }).then(showGeocodedAddressOnMap(false));
-
-          for (let j = 0; j < results.length; j++) {
-            geocoder.geocode({ address: destinationList[j] }).then(showGeocodedAddressOnMap(true));
-          }
-        }
-      });
-
-      // Add event listener to the "Center on My Location" button
       document.getElementById("my-location-btn").addEventListener("click", centerOnMyLocation);
+      document.getElementById("request-ambulance-btn").addEventListener("click", requestAmbulance);
+      document.getElementById("clear-info-btn").addEventListener("click", clearInfoWindow);
     }
 
-    // Function to center map on user's location
     function centerOnMyLocation() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -169,28 +230,84 @@
               lat: position.coords.latitude,
               lng: position.coords.longitude,
             };
-
-            // Center the map and add a marker at the user's location
             map.setCenter(userLocation);
             map.setZoom(14);
-
-            // Clear out any old markers
             deleteMarkers();
-
-            // Place a marker at the user's location
             markersArray.push(new google.maps.Marker({
               map: map,
               position: userLocation,
               label: "You",
             }));
           },
-          () => {
-            alert("Error: Unable to retrieve your location.");
-          }
+          () => alert("Error: Unable to retrieve your location.")
         );
       } else {
         alert("Geolocation is not supported by this browser.");
       }
+    }
+
+    function requestAmbulance() {
+      const origin = document.getElementById("origin-input").value;
+      const destination = document.getElementById("destination-input").value;
+
+      if (origin && destination) {
+        geocodeAndRequestAmbulance(origin, destination);
+      } else {
+        alert("Please enter both origin and destination.");
+      }
+    }
+
+    function geocodeAndRequestAmbulance(origin, destination) {
+      geocoder.geocode({ address: origin }, (results, status) => {
+        if (status === "OK") {
+          const originLocation = results[0].geometry.location;
+          geocoder.geocode({ address: destination }, (results, status) => {
+            if (status === "OK") {
+              const destinationLocation = results[0].geometry.location;
+              calculateRoute(originLocation, destinationLocation);
+            } else {
+              alert("Unable to geocode the destination.");
+            }
+          });
+        } else {
+          alert("Unable to geocode the origin.");
+        }
+      });
+    }
+
+    function calculateRoute(originLocation, destinationLocation) {
+      const distanceService = new google.maps.DistanceMatrixService();
+      distanceService.getDistanceMatrix({
+        origins: [originLocation],
+        destinations: [destinationLocation],
+        travelMode: 'DRIVING',
+      }, (response, status) => {
+        if (status === 'OK') {
+          const distance = response.rows[0].elements[0].distance.text;
+          const duration = response.rows[0].elements[0].duration.text;
+          document.getElementById("request").innerText = `Distance: ${distance}\nDuration: ${duration}`;
+          moveAmbulanceToDestination(destinationLocation, distance, duration);
+        } else {
+          alert("Distance Matrix request failed.");
+        }
+      });
+    }
+
+    function moveAmbulanceToDestination(destinationLocation, distance, duration) {
+      if (!ambulanceMarker) {
+        ambulanceMarker = new google.maps.Marker({
+          map: map,
+          position: destinationLocation,
+          label: "Ambulance",
+        });
+      }
+      ambulanceMarker.setPosition(destinationLocation);
+    }
+
+    function clearInfoWindow() {
+      document.getElementById("request").innerText = '';
+      document.getElementById("response").innerText = '';
+      deleteMarkers();
     }
 
     function deleteMarkers() {
@@ -199,8 +316,6 @@
       }
       markersArray = [];
     }
-
-    window.initMap = initMap;
   </script>
 </body>
 </html>
